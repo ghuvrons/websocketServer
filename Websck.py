@@ -6,7 +6,7 @@ import time
 from select import select
 from hashlib import sha1
 
-class Client(threading.Thread):
+class ClientHandler(threading.Thread):
 	def __init__(self, sock, addr, origin = ''):
 		threading.Thread.__init__(self)
 		self.origin = origin
@@ -193,19 +193,21 @@ class Websck:
 		self.server_socket.listen(10)
 		self.origin = origin
 		self.client_list = []
+		self.clientClass = ClientHandler
 
+	def setClientClass(self, clientClass):
+		self.clientClass = clientClass
+		
 	def run(self):
 		while True:
 			sock, addr = self.server_socket.accept()
-			client = Client(sock, addr)
+			client = self.clientClass(sock, addr)
 			client.start()
 			
 	def close(self):
 		self.server_socket.close()
 		
 if __name__ == "__main__":
-    ws = Websck("127.0.0.1",5000)
-
-    ws.run()
-
-    ws.close()
+	ws = Websck("127.0.0.1",5000)
+	ws.run()
+	ws.close()
